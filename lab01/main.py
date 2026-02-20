@@ -1,7 +1,10 @@
 import math
+import time
 import tkinter as tk
 
 import matplotlib.pyplot as plt
+
+plt.ion()
 
 all_trajectories = []
 all_dts = []
@@ -17,12 +20,12 @@ def calculate_trajectory(height, angle, speed, size, weight, dt):
     a = angle * math.pi / 180
     vx = speed * math.cos(a)
     vy = speed * math.sin(a)
-    k = 0.5 * c * rho * size / weight  # сила сопротивления воздуха
+    k = 0.5 * c * rho * size / weight
 
     points = []
     max_y = y
 
-    while y > 0:
+    while y >= 0:
         v = math.sqrt(vx**2 + vy**2)
         vx -= k * vx * v * dt
         vy -= (g + k * vy * v) * dt
@@ -32,7 +35,7 @@ def calculate_trajectory(height, angle, speed, size, weight, dt):
         if y > max_y:
             max_y = y
 
-        if y > 0:
+        if y >= 0:
             points.append((x, y))
 
     final_speed = math.sqrt(vx**2 + vy**2)
@@ -56,9 +59,9 @@ def add_trajectory():
         all_dts.append(dt)
 
         metrics_label.config(
-            text=f"Дальность: {distance:.1f} м\n"
-            f"Макс. высота: {max_height:.1f} м\n"
-            f"Скорость при падении: {final_speed:.1f} м/с"
+            text=f"Дальность: {distance:.3f} м\n"
+            f"Макс. высота: {max_height:.3f} м\n"
+            f"Скорость при падении: {final_speed:.3f} м/с"
         )
 
         draw_graph()
@@ -73,11 +76,25 @@ def clear_trajectories():
     draw_graph()
 
 
+# trajectories = ((0,1), (101,102))
+# x, y = *zip
+# x = 0, 101
+# y = 1, 102
+
+
 def draw_graph():
     plt.clf()
     for traj, dt in zip(all_trajectories, all_dts):
         xs, ys = zip(*traj)
-        plt.plot(xs, ys, label=f"dt={dt}")
+        for i in range(0, len(xs), 50):
+            plt.plot(
+                xs[:i],
+                ys[:i],
+                label=f"dt={dt}"
+                if i == len(xs) - 5
+                else "",  # чтобы не рисовать dt каждый раз, а только в конце
+            )
+            plt.pause(0.0001)
 
     plt.xlabel("x")
     plt.ylabel("y")
@@ -85,7 +102,6 @@ def draw_graph():
     plt.grid(True)
     if all_trajectories:
         plt.legend()
-    plt.show()
 
 
 root = tk.Tk()
@@ -94,17 +110,17 @@ root.geometry("520x520")
 
 tk.Label(root, text="Шаг моделирования, с:").pack()
 entry_dt = tk.Entry(root)
-entry_dt.insert(0, "1")
+entry_dt.insert(0, "0.001")
 entry_dt.pack()
 
 tk.Label(root, text="Высота, м:").pack()
 entry_height = tk.Entry(root)
-entry_height.insert(0, "1000")
+entry_height.insert(0, "0")
 entry_height.pack()
 
 tk.Label(root, text="Угол:").pack()
 entry_angle = tk.Entry(root)
-entry_angle.insert(0, "45")
+entry_angle.insert(0, "10")
 entry_angle.pack()
 
 tk.Label(root, text="Скорость, м/с:").pack()
