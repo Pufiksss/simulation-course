@@ -76,12 +76,6 @@ def clear_trajectories():
     draw_graph()
 
 
-# trajectories = ((0,1), (101,102))
-# x, y = *zip
-# x = 0, 101
-# y = 1, 102
-
-
 def draw_graph():
     plt.clf()
     for traj, dt in zip(all_trajectories, all_dts):
@@ -90,9 +84,7 @@ def draw_graph():
             plt.plot(
                 xs[:i],
                 ys[:i],
-                label=f"dt={dt}"
-                if i == len(xs) - 5
-                else "",  # чтобы не рисовать dt каждый раз, а только в конце
+                label=f"dt={dt}" if i == len(xs) - 5 else "",
             )
             plt.pause(0.0001)
 
