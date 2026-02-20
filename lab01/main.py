@@ -73,19 +73,32 @@ def clear_trajectories():
     all_trajectories.clear()
     all_dts.clear()
     metrics_label.config(text="")
-    draw_graph()
+    plt.clf()
+    plt.draw()
 
 
 def draw_graph():
     plt.clf()
-    for traj, dt in zip(all_trajectories, all_dts):
+
+    unique_dts = set()
+    for traj, dt in zip(all_trajectories[:-1], all_dts[:-1]):
         xs, ys = zip(*traj)
-        for i in range(0, len(xs), 50):
-            plt.plot(
-                xs[:i],
-                ys[:i],
-                label=f"dt={dt}" if i == len(xs) - 5 else "",
+        plt.plot(xs, ys, label=f"dt={dt}" if dt not in unique_dts else "")
+        unique_dts.add(dt)
+
+    if all_trajectories:
+        last_traj = all_trajectories[-1]
+        last_dt = all_dts[-1]
+        xs, ys = zip(*last_traj)
+
+        step = max(1, len(xs) // 50)
+        for i in range(0, len(xs), step):
+            label = (
+                f"dt={last_dt}"
+                if (i == 0 and last_dt not in unique_dts)
+                else ""
             )
+            plt.plot(xs[:i], ys[:i], label=label)
             plt.pause(0.0001)
 
     plt.xlabel("x")
@@ -94,6 +107,7 @@ def draw_graph():
     plt.grid(True)
     if all_trajectories:
         plt.legend()
+    plt.draw()
 
 
 root = tk.Tk()
