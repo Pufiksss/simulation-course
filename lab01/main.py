@@ -103,7 +103,6 @@ root = tk.Tk()
 root.title("Моделирование полёта тела в атмосфере")
 root.geometry("1000x520")
 
-# Left panel — controls
 left_frame = tk.Frame(root)
 left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
 
