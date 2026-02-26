@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
-def simulate(h, tau, lam, rho_c, L, T0, T_left, T_right, t_end):
+def simulate(h, tau, lam, pc, L, T0, T_left, T_right, t_end):
     N = int(L / h) + 1
     x = [i * h for i in range(N)]
 
@@ -20,7 +20,7 @@ def simulate(h, tau, lam, rho_c, L, T0, T_left, T_right, t_end):
 
     A = lam / h**2
     C = lam / h**2
-    B = 2 * lam / h**2 + rho_c / tau
+    B = 2 * lam / h**2 + pc / tau
 
     steps = int(t_end / tau)
     start_time = time.time()
@@ -28,16 +28,16 @@ def simulate(h, tau, lam, rho_c, L, T0, T_left, T_right, t_end):
     for _ in range(steps):
         F = [0.0] * N
         for i in range(1, N - 1):
-            F[i] = -(rho_c / tau) * T[i]
+            F[i] = -(pc / tau) * T[i]
 
         alpha = [0.0] * N
         beta = [0.0] * N
+        alpha[1] = 0.0
         beta[1] = T_left
 
         for i in range(2, N - 1):
-            denom = B - C * alpha[i - 1]
-            alpha[i] = A / denom
-            beta[i] = (C * beta[i - 1] - F[i]) / denom
+            alpha[i] = A / (B - C * alpha[i - 1])
+            beta[i] = (C * beta[i - 1] - F[i]) / (B - C * alpha[i - 1])
 
         T_new = T[:]
         T_new[0] = T_left
@@ -60,19 +60,18 @@ def run():
         h = float(entry_dx.get())
         tau = float(entry_dt.get())
         lam = float(entry_lam.get())
-        rho_c = float(entry_rhoc.get())
+        pc = float(entry_p.get()) * float(entry_c.get())
         L = float(entry_L.get())
         T0 = float(entry_T0.get())
         T_left = float(entry_Tleft.get())
         T_right = float(entry_Tright.get())
         t_end = float(entry_tend.get())
-
     except ValueError:
         messagebox.showerror("Ошибка", "Введите числа во все поля!")
         return
 
     T_final, x, T_center, elapsed = simulate(
-        h, tau, lam, rho_c, L, T0, T_left, T_right, t_end
+        h, tau, lam, pc, L, T0, T_left, T_right, t_end
     )
 
     label_result.config(
@@ -94,14 +93,14 @@ def run():
         color="red",
     )
     ax.set_xlabel("x, м")
-    ax.set_ylabel("T, °C")
+    ax.set_ylabel("T, C")
     ax.set_title(f"Распределение температуры в пластине (t = {t_end} с)")
     ax.grid(True)
     canvas.draw()
 
 
 root = tk.Tk()
-root.title("Лабораторная 2 — Теплопроводность")
+root.title("Лабораторная 2 — Теплопроводность (метод сеток)")
 root.resizable(False, False)
 
 frame_left = tk.Frame(root, padx=15, pady=15)
@@ -112,14 +111,15 @@ tk.Label(frame_left, text="Параметры", font=("Arial", 12, "bold")).grid
 )
 
 fields = [
-    ("Толщина пластины L, м:", "1.0"),
-    ("Начальная температура T0, °C:", "100"),
-    ("Темп. левой границы Ta, C:", "0"),
-    ("Темп. правой границы Tb, C:", "0"),
-    ("Теплопроводность λ, Вт/(м*К):", "50"),
-    ("Теплоемкость p*c, Дж/(м^3 * К):", "5000"),
+    ("Толщина пластины L, м:", "0.1"),
+    ("Начальная температура T0, C:", "100"),
+    ("Темп. левой границы Tл, C:", "0"),
+    ("Темп. правой границы Tп, C:", "0"),
+    ("Теплопроводность λ, Вт/(м * C):", "394"),
+    ("Плотность тела ρ, кг / м^3", "8920"),
+    ("Удельная теплоемкость c, Дж / (кг * C): ", "380"),
     ("Время моделирования t, с:", "2.0"),
-    ("Шаг по пространству h, м:", "0.01"),
+    ("Шаг по пространству h, м:", "0.1"),
     ("Шаг по времени t, с:", "0.1"),
 ]
 
@@ -128,7 +128,7 @@ for i, (text, default) in enumerate(fields):
     tk.Label(frame_left, text=text, anchor="w").grid(
         row=i + 1, column=0, sticky="w", pady=3
     )
-    e = tk.Entry(frame_left, width=10)
+    e = tk.Entry(frame_left, width=12)
     e.insert(0, default)
     e.grid(row=i + 1, column=1, padx=(10, 0), pady=3)
     entries.append(e)
@@ -139,7 +139,8 @@ for i, (text, default) in enumerate(fields):
     entry_Tleft,
     entry_Tright,
     entry_lam,
-    entry_rhoc,
+    entry_p,
+    entry_c,
     entry_tend,
     entry_dx,
     entry_dt,
