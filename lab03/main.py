@@ -15,6 +15,7 @@ BURNING = 2
 ASH = 3
 WET = 4
 
+
 COLORS = {
     EMPTY: (80, 60, 40),
     TREE: (34, 139, 34),
