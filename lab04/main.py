@@ -4,9 +4,9 @@ import time
 
 class BasicRNG:
     def __init__(self, seed=42):
-        self.m = 2**31 - 1
-        self.a = 1103515245
-        self.c = 12345
+        self.m = 2**31 - 1  # модуль, число Мерсена
+        self.a = 1103515245  # множитель, теорема Халла - Добелла
+        self.c = 12345  # приращение, если 0 = мультипликативный
         self.x = seed
 
     def next(self):
