@@ -34,7 +34,7 @@ def generate_group_event():
     cumulative = 0.0
     k = 0
     while k < len(probabilities):
-        cumulative = cumulative + probabilities[k]
+        cumulative += probabilities[k]
         if alpha < cumulative:
             return k
         k = k + 1
