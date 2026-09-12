@@ -41,11 +41,6 @@ def generate_dsv(probs):
 
 # вычисляет вероятности перехода
 def transition_probs(i):
-    """
-    Ряд распределения для выбора следующего состояния:
-        p_j = -q_ij / q_ii  при j != i
-        p_j = 0             при j == i
-    """
     q_ii = Q[i][i]
     probs = []
     for j in range(N):
@@ -57,15 +52,6 @@ def transition_probs(i):
 
 
 def next_event(i):
-    """
-    Один шаг моделирования.
-    Возвращает (tau, j):
-        tau - сколько ещё времени процесс пробудет в состоянии i,
-        j   - в какое состояние он потом перейдёт.
-
-    tau = ln(alpha) / q_ii.  Здесь ln(alpha) < 0 и q_ii < 0,
-    поэтому tau получается положительным.
-    """
     alpha = base_random()
     tau = math.log(alpha) / Q[i][i]
     j = generate_dsv(transition_probs(i))
@@ -73,10 +59,6 @@ def next_event(i):
 
 
 def stationary_theory():
-    """
-    Теоретическое стационарное распределение.
-    Решаем систему:  pi * Q = 0  и  sum(pi) = 1.
-    """
     A = np.array(Q, dtype=float).T  # pi*Q = 0  <=>  Q^T * pi^T = 0
     A = np.vstack([A, np.ones(N)])  # дописываем условие нормировки
     b = np.zeros(N + 1)
@@ -178,7 +160,6 @@ class App:
         self.lbl_steps = ttk.Label(panel, text="")
         self.lbl_steps.pack(anchor="w")
 
-        # ---------- графики ----------
         self.fig = plt.Figure(figsize=(8, 5.0), dpi=95)
         self.ax_tr = self.fig.add_subplot(2, 1, 1)
         self.ax_bar = self.fig.add_subplot(2, 1, 2)
@@ -188,7 +169,6 @@ class App:
         self.canvas = FigureCanvasTkAgg(self.fig, master=middle)
         self.canvas.get_tk_widget().pack(side="left", fill="both", expand=True)
 
-        # ---------- таблица результатов ----------
         cols = ("state", "dur", "emp", "theory", "err")
         titles = {
             "state": "Состояние",
@@ -210,15 +190,6 @@ class App:
             )
 
     def reset_model(self):
-        """
-        Ставит процесс в начальное состояние и разыгрывает первое событие.
-
-        t       - текущее модельное время
-        i       - текущее состояние
-        t_next  - момент следующей смены состояния
-        j_next  - состояние, в которое перейдём в момент t_next
-        dur     - суммарное время пребывания в каждом состоянии
-        """
         self.t = 0.0
         self.i = self.start_state.current()
         tau, self.j_next = next_event(self.i)
@@ -252,13 +223,6 @@ class App:
         self.update_all()
 
     def tick(self):
-        """
-        Один кадр анимации: продвигаем модельное время на dt.
-
-        За один кадр может произойти несколько смен состояния,
-        поэтому здесь цикл while, а не if. Иначе часть переходов
-        потерялась бы и статистика оказалась бы смещённой.
-        """
         if not self.running:
             return
 
@@ -288,15 +252,7 @@ class App:
 
         self.after_id = self.root.after(TICK_MS, self.tick)
 
-    # -----------------------------------------------------------------
-    #  Статистическая обработка и отображение
-    # -----------------------------------------------------------------
-
     def empirical(self):
-        """
-        Доля времени пребывания в каждом состоянии.
-        Это и есть эмпирическая оценка стационарного распределения.
-        """
         total = sum(self.dur)
         if total <= 0:
             return [0.0] * N
@@ -319,7 +275,6 @@ class App:
     def update_plots(self):
         window = 30.0
 
-        # --- траектория процесса ---
         self.ax_tr.clear()
         times = [p[0] for p in self.traj] + [self.t]
         states = [p[1] + 1 for p in self.traj] + [self.i + 1]
@@ -337,7 +292,6 @@ class App:
         self.ax_tr.set_title("Траектория процесса (окно 30 дней)")
         self.ax_tr.grid(True, alpha=0.3)
 
-        # --- эмпирика против теории ---
         self.ax_bar.clear()
         emp = self.empirical()
         x = np.arange(N)

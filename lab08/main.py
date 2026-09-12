@@ -165,7 +165,6 @@ class App:
         self.canvas.get_tk_widget().pack(side="left", fill="both", expand=True)
 
     def read_params(self):
-        """Читает параметры из полей. Возвращает (lam, T, N) или None."""
         try:
             lam = float(self.entries["lam"].get().replace(",", "."))
             interval = float(self.entries["T"].get().replace(",", "."))
@@ -207,7 +206,6 @@ class App:
         self.canvas.draw()
 
     def draw_flow(self):
-        """Одна реализация потока: моменты поступления заявок на оси времени."""
         self.ax_flow.clear()
         for t in self.moments:
             self.ax_flow.plot([t, t], [0, 1], color="#1E88E5", linewidth=1.5)
@@ -222,7 +220,6 @@ class App:
         )
 
     def draw_distribution(self):
-        """Эмпирическое распределение числа заявок против теоретического."""
         emp = empirical_distribution(self.counts)
         a = self.lam * self.interval
         theory = poisson_probs(a, len(emp) - 1)
