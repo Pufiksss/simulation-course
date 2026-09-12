@@ -168,9 +168,9 @@ btn_ask.pack(side="left", padx=8)
 btn_stats = tk.Button(
     frame_buttons,
     text="Статистика",
-    font=("Courier New", 12),
-    bg="#313244",
-    fg="#cdd6f4",
+    font=("Courier New", 12, "bold"),
+    bg="#cba6f7",
+    fg="#1e1e2e",
     relief="flat",
     padx=15,
     pady=6,
@@ -179,7 +179,6 @@ btn_stats = tk.Button(
 )
 btn_stats.pack(side="left", padx=8)
 
-# Ответ
 label_answer = tk.Label(
     window,
     text="...",
