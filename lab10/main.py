@@ -145,7 +145,6 @@ class Cafe:
             self.refused = self.refused + 1
 
     def take_from_queue(self):
-        """Бариста освободился и забирает первого из очереди."""
         if not self.queue:
             return None
         client = self.queue.pop(0)
@@ -153,7 +152,6 @@ class Cafe:
         return client
 
     def client_gave_up(self, client):
-        """ПРАВИЛО 2: клиент не дождался и ушёл из очереди."""
         self.queue.remove(client)
         self.gave_up = self.gave_up + 1
         self.record_wait(self.t - client.arrival_time)
@@ -188,12 +186,10 @@ class Cafe:
         self.stat_time = self.stat_time + dt
 
     def run_until(self, until):
-        """Прокрутить модель до заданного момента времени."""
         while self.t < until:
             self.step()
 
     def busy_distribution(self):
-        """Эмпирическое распределение числа занятых бариста."""
         if self.stat_time <= 0:
             return [0.0] * (len(self.baristas) + 1)
         return [
@@ -202,7 +198,6 @@ class Cafe:
         ]
 
     def queue_distribution(self):
-        """Эмпирическое распределение длины очереди."""
         if self.stat_time <= 0:
             return [0.0] * (self.places + 1)
         return [
