@@ -93,8 +93,6 @@ class App:
         self.build_interface()
         self.run()
 
-    # -----------------------------------------------------------------
-
     def build_interface(self):
         box = ttk.LabelFrame(
             self.root,
@@ -121,7 +119,6 @@ class App:
         middle = ttk.Frame(self.root)
         middle.pack(fill="both", expand=True, padx=8, pady=(8, 0))
 
-        # ---------- панель управления ----------
         panel = ttk.LabelFrame(
             middle, text="Параметры моделирования", padding=10
         )
@@ -154,7 +151,6 @@ class App:
         )
         self.info.pack(anchor="w", fill="x")
 
-        # ---------- графики ----------
         self.fig = plt.Figure(figsize=(8, 5.2), dpi=95)
         self.ax_flow = self.fig.add_subplot(2, 1, 1)
         self.ax_dist = self.fig.add_subplot(2, 1, 2)
@@ -180,7 +176,6 @@ class App:
         return lam, interval, runs
 
     def run(self):
-        """Полный эксперимент: N прогонов, статобработка, отрисовка."""
         params = self.read_params()
         if params is None:
             return
@@ -198,7 +193,6 @@ class App:
         self.canvas.draw()
 
     def new_realization(self):
-        """Показать другую единичную реализацию потока (верхний график)."""
         if not self.counts:
             return
         self.moments = simulate_flow(self.lam, self.interval)
