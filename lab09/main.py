@@ -33,11 +33,11 @@ def simulate(lam, mu, sim_time, warmup):
     t = 0.0
     x = 0  # клиент у оператора
     y = 0  # клиенты в очереди
-    queue = []
+    queue = []  # храним время прихода клиентов в очереди
     serving_arrival = None  # момент прихода того, кого обслуживают сейчас
 
     time_in_state = {}  # n клиентов в системе -> суммарное время
-    waits = []
+    waits = []  # сколько каждый простоял в очереди
     systems = []
 
     while t < sim_time:
